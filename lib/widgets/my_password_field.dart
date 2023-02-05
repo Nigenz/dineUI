@@ -6,23 +6,30 @@ class PasswordField extends StatelessWidget {
     Key? key,
     required this.isPassWordVisible,
     required this.onTap,
-    required this.hintText,
+    required this.labelText,
+    required this.parameterText,
   }) : super(key: key);
 
   final bool isPassWordVisible;
   final VoidCallback onTap;
-  final String hintText;
+  final String labelText;
+  final TextEditingController parameterText;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
-      child: TextField(
+      child: TextFormField(
         style: kBodyText.copyWith(color: Colors.white),
         obscureText: isPassWordVisible,
         keyboardType: TextInputType.text,
         textInputAction: TextInputAction.done,
+        controller: parameterText,
         decoration: InputDecoration(
+            prefixIcon: const Icon(
+              Icons.lock_outline,
+              color: Colors.grey,
+            ),
             suffixIcon: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: IconButton(
@@ -35,16 +42,16 @@ class PasswordField extends StatelessWidget {
                   )),
             ),
             contentPadding: EdgeInsets.all(20),
-            hintText: hintText,
-            hintStyle: kBodyText,
+            labelText: labelText,
+            labelStyle: kBodyText,
             enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(
+                borderSide: const BorderSide(
                   color: Colors.grey,
                   width: 1,
                 ),
                 borderRadius: BorderRadius.circular(18)),
             focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(
+                borderSide: const BorderSide(
                   color: Colors.white,
                   width: 1,
                 ),

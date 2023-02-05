@@ -1,4 +1,5 @@
 import 'package:dine/screens/register.dart';
+import 'package:dine/screens/user_details_page.dart';
 import 'package:dine/widgets/custom_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../api_requests/register_auth.dart';
 import '../constants.dart';
 import '../responsive.dart';
 
@@ -17,6 +19,42 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final ApiClient _apiClient = ApiClient();
+  final TextEditingController parameterTextEmail = TextEditingController();
+  final TextEditingController parameterTextPassword = TextEditingController();
+
+  Future<void> loginUsers() async {
+    if (_formKey.currentState!.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: const Text('Processing Data'),
+        backgroundColor: Colors.green.shade300,
+      ));
+
+      Map<String, dynamic> userData = {
+        "Email": parameterTextEmail.text,
+        "Password": parameterTextPassword.text,
+      };
+
+      dynamic result = await _apiClient.registerUser(userData);
+
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+      if (result['ErrorCode'] == null) {
+        // ignore: use_build_context_synchronously
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const UserDetail()));
+      } else {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Error: ${result['Message']}'),
+          backgroundColor: Colors.red.shade300,
+        ));
+      }
+    }
+  }
+
   bool isPassWordVisible = true;
   @override
   Widget build(BuildContext context) {
@@ -78,18 +116,20 @@ class _LoginPageState extends State<LoginPage> {
                         padding: const EdgeInsets.all(20),
                         child: Column(
                           children: [
-                            MyTextField(
-                              hintText: "Enter email address",
+                            EmailField(
+                              labelText: "Enter Email Address ",
                               inputType: TextInputType.emailAddress,
+                              parameterText: parameterTextEmail,
                             ),
                             PasswordField(
-                              hintText: "Enter Password",
+                              labelText: "Enter Password",
                               isPassWordVisible: isPassWordVisible,
                               onTap: () {
                                 setState(() {
                                   isPassWordVisible = !isPassWordVisible;
                                 });
                               },
+                              parameterText: parameterTextPassword,
                             ),
                             Container(
                               alignment: Alignment.centerRight,

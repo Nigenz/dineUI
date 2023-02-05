@@ -2,8 +2,8 @@ import 'package:dine/utils/validator.dart';
 import 'package:flutter/material.dart';
 import '../constants.dart';
 
-class MyTextField extends StatelessWidget {
-  const MyTextField({
+class EmailField extends StatelessWidget {
+  const EmailField({
     Key? key,
     required this.inputType,
     required this.labelText,
@@ -27,7 +27,7 @@ class MyTextField extends StatelessWidget {
             contentPadding: const EdgeInsets.all(20),
             labelText: labelText,
             labelStyle: kBodyText,
-            prefixIcon: const Icon(Icons.people_outline, color: Colors.grey),
+            prefixIcon: const Icon(Icons.email_outlined, color: Colors.grey),
             enabledBorder: OutlineInputBorder(
                 borderSide: const BorderSide(
                   color: Colors.grey,

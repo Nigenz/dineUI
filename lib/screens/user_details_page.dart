@@ -9,6 +9,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../api_requests/register_auth.dart';
 import '../responsive.dart';
 import '../widgets/custom_widget.dart';
 
@@ -20,6 +21,49 @@ class UserDetail extends StatefulWidget {
 }
 
 class _UserDetailState extends State<UserDetail> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final ApiClient _apiClient = ApiClient();
+  final TextEditingController parameterTextHotelName = TextEditingController();
+  final TextEditingController parameterTextOwner = TextEditingController();
+  final TextEditingController parameterTextAddress = TextEditingController();
+  final TextEditingController parameterTextRegistration =
+      TextEditingController();
+  final TextEditingController parameterTextContactNo = TextEditingController();
+
+  Future<void> userDetails() async {
+    if (_formKey.currentState!.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: const Text('Processing Data'),
+        backgroundColor: Colors.green.shade300,
+      ));
+
+      Map<String, dynamic> userData = {
+        "HotelName": parameterTextHotelName.text,
+        "OwnerName": parameterTextOwner.text,
+        "HotelAddress": parameterTextAddress.text,
+        "HotelRegister": parameterTextRegistration.text,
+        "ContactNo": parameterTextContactNo.text,
+      };
+
+      dynamic result = await _apiClient.registerUser(userData);
+
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+      if (result['ErrorCode'] == null) {
+        // ignore: use_build_context_synchronously
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const UserDetail()));
+      } else {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Error: ${result['Message']}'),
+          backgroundColor: Colors.red.shade300,
+        ));
+      }
+    }
+  }
+
   bool isPassWordVisible = true;
   bool isChecked = false;
   @override
@@ -72,26 +116,31 @@ class _UserDetailState extends State<UserDetail> {
                       child: Padding(
                         padding: const EdgeInsets.all(20),
                         child: Column(
-                          children: const [
+                          children: [
                             MyTextField(
-                              hintText: "Enter hotel/restaurant name",
+                              labelText: "Enter Hotel/Restaurant Name",
                               inputType: TextInputType.text,
+                              parameterText: parameterTextHotelName,
                             ),
                             MyTextField(
-                              hintText: "Enter owner's Name",
+                              labelText: "Enter Owner's Name",
                               inputType: TextInputType.text,
+                              parameterText: parameterTextOwner,
                             ),
                             MyTextField(
-                              hintText: "Enter hotel/restaurant address",
+                              labelText: "Enter Hotel/Restaurant Address",
                               inputType: TextInputType.streetAddress,
+                              parameterText: parameterTextAddress,
                             ),
                             MyTextField(
-                              hintText: "Enter valid registration no. ",
+                              labelText: "Enter Valid Registration No. ",
                               inputType: TextInputType.text,
+                              parameterText: parameterTextRegistration,
                             ),
                             MyTextField(
-                              hintText: "Enter contact no. ",
+                              labelText: "Enter Contact No. ",
                               inputType: TextInputType.phone,
+                              parameterText: parameterTextContactNo,
                             ),
                           ],
                         ),

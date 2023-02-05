@@ -5,11 +5,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:dine/api_requests/register_auth.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../responsive.dart';
+import '../utils/validator.dart';
 import '../widgets/custom_widget.dart';
 
 class Registration extends StatefulWidget {
@@ -20,13 +22,55 @@ class Registration extends StatefulWidget {
 }
 
 class _RegistrationState extends State<Registration> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final ApiClient _apiClient = ApiClient();
+  final TextEditingController parameterTextFirstName = TextEditingController();
+  final TextEditingController parameterTextLastName = TextEditingController();
+  final TextEditingController parameterTextEmail = TextEditingController();
+  final TextEditingController parameterTextPassword = TextEditingController();
+  final TextEditingController parameterTextConfirmPassword =
+      TextEditingController();
+
+  Future<void> registerUsers() async {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: const Text('Processing Data'),
+      backgroundColor: Colors.green.shade300,
+    ));
+
+    Map<String, dynamic> userData = {
+      "firstName": parameterTextFirstName.text,
+      "lastName": parameterTextLastName.text,
+      "email": parameterTextEmail.text,
+      "password": parameterTextPassword.text,
+      "confirmPassword": parameterTextConfirmPassword.text,
+    };
+    print(userData);
+    dynamic result = await _apiClient.registerUser(userData);
+    print(result);
+
+    // ignore: use_build_context_synchronously
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+    if (result == "success") {
+      // ignore: use_build_context_synchronously
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => const UserDetail()));
+    } else {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: const Text('Error Registering User'),
+        backgroundColor: Colors.red.shade300,
+      ));
+    }
+  }
+
   bool isPassWordVisible = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text(
+        title: const Text(
           "Sign Up",
           textAlign: TextAlign.center,
           style: appBarTitle,
@@ -73,34 +117,39 @@ class _RegistrationState extends State<Registration> {
                         child: Column(
                           children: [
                             MyTextField(
-                              hintText: "Enter First Name",
+                              labelText: "Enter First Name",
                               inputType: TextInputType.text,
+                              parameterText: parameterTextFirstName,
                             ),
                             MyTextField(
-                              hintText: "Enter Last Name",
+                              labelText: "Enter Last Name",
                               inputType: TextInputType.text,
+                              parameterText: parameterTextLastName,
                             ),
-                            MyTextField(
-                              hintText: "Enter email address",
+                            EmailField(
+                              labelText: "Enter Email Address",
                               inputType: TextInputType.emailAddress,
+                              parameterText: parameterTextEmail,
                             ),
                             PasswordField(
-                              hintText: "Enter Password",
+                              labelText: "Enter Password",
                               isPassWordVisible: isPassWordVisible,
                               onTap: () {
                                 setState(() {
                                   isPassWordVisible = !isPassWordVisible;
                                 });
                               },
+                              parameterText: parameterTextPassword,
                             ),
                             PasswordField(
-                              hintText: "Confirm Password",
+                              labelText: "Confirm Password",
                               isPassWordVisible: isPassWordVisible,
                               onTap: () {
                                 setState(() {
                                   isPassWordVisible = !isPassWordVisible;
                                 });
                               },
+                              parameterText: parameterTextConfirmPassword,
                             ),
                           ],
                         ),
@@ -111,7 +160,7 @@ class _RegistrationState extends State<Registration> {
                       ? Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
+                            const Text(
                               "Already have an account? ",
                               style: kBodyText,
                             ),
@@ -136,7 +185,7 @@ class _RegistrationState extends State<Registration> {
                       : Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
+                            const Text(
                               "Already have an account? ",
                               style: kBodyText,
                             ),
@@ -158,7 +207,7 @@ class _RegistrationState extends State<Registration> {
                             ),
                           ],
                         ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   Container(
@@ -170,13 +219,14 @@ class _RegistrationState extends State<Registration> {
                       padding: const EdgeInsets.all(20),
                       child: MyTextButton(
                           buttonName: "Register",
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              CupertinoPageRoute(
-                                  builder: ((context) => const UserDetail())),
-                            );
-                          },
+                          onTap: registerUsers,
+                          // onTap: () {
+                          //   Navigator.push(
+                          //     context,
+                          //     CupertinoPageRoute(
+                          //         builder: ((context) => const UserDetail())),
+                          //   );
+                          // },
                           bgColor: Colors.white,
                           textColor: Colors.black87),
                     ),
